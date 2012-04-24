@@ -5,5 +5,12 @@ class MainPage(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write('Hello, Udacity!')
 
-app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+
+class TestHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write('TestHandler!!')
+
+app = webapp2.WSGIApplication([('/', MainPage), 
+                               ('/test', TestHandler)], debug=True)
 
