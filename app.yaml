@@ -5,5 +5,12 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
-  script: helloudacity.app
+- url: /
+  script: home.app
+
+- url: /unit2/rot13
+  script: rot13.app
+
+- url: /unit2/signup
+  script: signup.app
+
