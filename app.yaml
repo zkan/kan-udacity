@@ -8,11 +8,11 @@ handlers:
 - url: /
   script: home.app
 
-- url: /unit2/rot13
+- url: /rot13
   script: rot13.app
 
-- url: /unit2/signup
+- url: /signup
   script: signup.app
 
-- url: /unit2/welcome
+- url: /welcome
   script: signup.app

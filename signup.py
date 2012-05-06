@@ -76,8 +76,16 @@ signup_page = """
 """
 
 class WelcomeHandler(webapp2.RequestHandler):
+    def is_valid_username(self, username):
+        USER_RE = re.compile(r'^[a-zA-Z0-9_-]{3,20}$')
+        if USER_RE.match(username):
+            return True
+
     def get(self):
         username = self.request.get('username')
+        if not self.is_valid_username(username):
+            self.redirect('/signup')
+
         self.response.out.write('Welcome, %s!' % username)
 
 class SignUpHandler(webapp2.RequestHandler):
@@ -139,12 +147,12 @@ class SignUpHandler(webapp2.RequestHandler):
         email_error = self.is_valid_email(email)
 
         if username_error == '' and password_error == '' and verify_password_error == '' and email_error == '':
-            self.redirect('/unit2/welcome?username=%s' % username)
+            self.redirect('/welcome?username=%s' % username)
         else:
             self.write_form(username, email, username_error, password_error, 
                             verify_password_error, email_error)
 
-app = webapp2.WSGIApplication([('/unit2/signup', SignUpHandler), 
-                               ('/unit2/welcome', WelcomeHandler)], 
+app = webapp2.WSGIApplication([('/signup', SignUpHandler), 
+                               ('/welcome', WelcomeHandler)], 
                                debug = True)
 

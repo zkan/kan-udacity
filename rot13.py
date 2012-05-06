@@ -42,5 +42,5 @@ class Rot13Handler(webapp2.RequestHandler):
 
         self.write_form(text)
 
-app = webapp2.WSGIApplication([('/unit2/rot13', Rot13Handler)], debug = True)
+app = webapp2.WSGIApplication([('/rot13', Rot13Handler)], debug = True)
 

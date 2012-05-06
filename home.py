@@ -13,10 +13,10 @@ main_page = """
     Hello, Udacity!
     <br>
     <div>
-        <a href='unit2/rot13'>rot13</a>
+        <a href='rot13'>rot13</a>
     </div>
     <div>
-        <a href='unit2/signup'>signup</a>
+        <a href='signup'>signup</a>
     </div>
 
 </body>
@@ -39,8 +39,8 @@ class MainPage(webapp2.RequestHandler):
 #        self.response.out.write('signup')
 
 app = webapp2.WSGIApplication([('/', MainPage), 
-                               ('/unit2/rot13', rot13.Rot13Handler),
-                               ('/unit2/signup', signup.SignUpHandler)], 
+                               ('/rot13', rot13.Rot13Handler),
+                               ('/signup', signup.SignUpHandler)], 
                                debug = True)
 
 
