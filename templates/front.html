@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- Udacity CS 253 Template -->
+<!-- URL: http://udacity-cs253.appspot.com/blog -->
+
+<html>
+<head>
+  <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+
+  <title>Kan-Udacity Blog</title>
+</head>
+
+<body>
+    <a href="/blog" class="main-title">
+        Kan-Udacity Blog
+    </a>
+
+    <div class="login-area">          
+        <a class="login-link" href="/login">login</a>
+        |
+        <a class="login-link" href="/signup">signup</a>
+    </div>
+
+    <div id="content">
+
+    {% for blog in blogs: %}
+        <div class="post">
+            <div class="post-heading">
+                <div class="post-title">
+                    {{blog.subject}}
+                </div>
+                <div class="post-date">
+                    {{blog.created.strftime('%h %d, %Y')}}
+                </div>
+            </div>
+            <div class="post-content">
+                {{blog.content}}
+            </div>
+        </div>
+        <br><br>
+    {% endfor %}
+
+    </div>
+</body>
+
+</html>

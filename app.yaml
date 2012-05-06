@@ -16,3 +16,20 @@ handlers:
 
 - url: /welcome
   script: signup.app
+
+- url: /blog
+  script: blog.app
+
+- url: /blog/newpost
+  script: blog.app
+
+- url: /blog/(\d+)
+  script: blog.app
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+libraries:
+- name: jinja2
+  version: latest
+
