@@ -64,7 +64,7 @@ class MainPage(Handler):
     def get(self, blog_id = ''):
         self.render_front(blog_id)
 
-app = webapp2.WSGIApplication([('/blog', MainPage),
+app = webapp2.WSGIApplication([('/blog/?', MainPage),
                                ('/blog/(\d+)', MainPage),
                                ('/blog/newpost', NewPostHandler)], 
                                debug = True)
