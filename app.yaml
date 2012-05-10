@@ -14,14 +14,14 @@ handlers:
 - url: /rot13
   script: rot13.app
 
-- url: /signup
-  script: signup.app
-
-- url: /welcome
-  script: signup.app
-
 - url: /blog.*
   script: blog.app
+
+#- url: /blog/signup
+#  script: signup.app
+
+#- url: /blog/welcome
+#  script: signup.app
 
 #- url: /blog/newpost
 #  script: blog.app
