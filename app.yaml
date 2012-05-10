@@ -5,6 +5,9 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /stylesheets
+  static_dir: stylesheets
+  
 - url: /
   script: home.app
 
@@ -25,9 +28,6 @@ handlers:
 
 - url: /blog/(\d+)
   script: blog.app
-
-- url: /stylesheets
-  static_dir: stylesheets
 
 libraries:
 - name: jinja2
