@@ -44,9 +44,19 @@ class Post(db.Model):
 # Classes
 class BlogFront(template.TemplateHandler):
     def get(self):
-#        posts = db.GqlQuery("select * from Post order by created desc limit 10")
+        logged_in = False
+        user_id = self.request.cookies.get('user_id')
+        if user_id:
+            logged_in = True
+            key = db.Key.from_path('User', int(user_id), parent=blog_key())
+            u = db.get(key)
+            username = u.username
+            
+#        posts = db.GqlQuery("select * from Post order by created desc limit 10")      
         posts = Post.all().order('-created')
-        self.render('front.html', posts = posts)
+        self.render('front.html', logged_in = logged_in, 
+                                  username = username, 
+                                  posts = posts)
 
 class PostPage(template.TemplateHandler):
     def get(self, post_id):
@@ -132,9 +142,9 @@ class SignUp(template.TemplateHandler):
             self.render('signup-form.html', **params)
         else:
             query = db.GqlQuery("select * from User where username = :username", username = username)
-            username_in_db = query.fetch(1)
+            user_in_db = query.fetch(1)
             
-            if not username_in_db:
+            if not user_in_db:
                 u = User(parent = blog_key(),
                          username = username, 
                          password = password, 
@@ -143,6 +153,7 @@ class SignUp(template.TemplateHandler):
 
                 user_id = str(u.key().id())
                 cookie_str = str('user_id=%s; Path=/' % user_id)
+                self.response.headers['Content-Type'] = 'text/plain'
                 self.response.headers.add_header('Set-Cookie', cookie_str)
                 self.redirect('/blog/welcome')
             else:
@@ -152,6 +163,27 @@ class SignUp(template.TemplateHandler):
 class LogIn(template.TemplateHandler):
     def get(self):
         self.render('login-form.html')
+    
+    def post(self):
+        have_error = False
+        username = str(self.request.get('username'))
+        password = str(self.request.get('password'))
+        
+        query = db.GqlQuery("select * from User where username = :username", username = username)
+        user_in_db = query.get()
+        if user_in_db:
+            if user_in_db.password == password:
+                user_id = user_in_db.key().id()
+                cookie_str = str('user_id=%s; Path=/' % user_id)
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.headers.add_header('Set-Cookie', cookie_str)
+                self.redirect('/blog/welcome')
+            else:
+                have_error = True
+        
+        if have_error:
+            error = 'Invalid login'
+            self.render('login-form.html', username = username, error = error )
 
 class LogOut(template.TemplateHandler):
     def get(self):
