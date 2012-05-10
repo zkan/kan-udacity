@@ -20,14 +20,14 @@ handlers:
 - url: /welcome
   script: signup.app
 
-- url: /blog/?
+- url: /blog.*
   script: blog.app
 
-- url: /blog/newpost
-  script: blog.app
+#- url: /blog/newpost
+#  script: blog.app
 
-- url: /blog/(\d+)
-  script: blog.app
+#- url: /blog/(\d+)
+#  script: blog.app
 
 libraries:
 - name: jinja2
