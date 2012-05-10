@@ -148,7 +148,7 @@ class SignUp(template.TemplateHandler):
 
 class LogIn(template.TemplateHandler):
     def get(self):
-        pass
+        self.render('login-form.html')
 
 class LogOut(template.TemplateHandler):
     def get(self):

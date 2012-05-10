@@ -1,17 +1,8 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-<head>
-    <title>Unit 2 Rot 13</title>
-    <style type="text/css">
-        .label {text-align: right}
-        .error {color: red}
-    </style>
+{% block content %}
 
-</head>
-
-<body>
-<h2>Signup</h2>
+    <h2>Signup</h2>
     <form method="post">
         <table>
             <tr>
@@ -19,7 +10,7 @@
                     Username
                 </td>
                 <td>
-                    <input type="text" name="username" value="{{username}}">
+                    <input style="width: 200px;" type="text" name="username" value="{{username}}">
                 </td>
                 <td class="error">
                     {{error_username}}
@@ -31,7 +22,7 @@
                     Password
                 </td>
                 <td>
-                    <input type="password" name="password" value="">
+                    <input style="width: 200px;" type="password" name="password" value="">
                 </td>
                 <td class="error">
                     {{error_password}}
@@ -43,7 +34,7 @@
                     Verify Password
                 </td>
                 <td>
-                    <input type="password" name="verify" value="">
+                    <input style="width: 200px;" type="password" name="verify" value="">
                 </td>
                 <td class="error">
                     {{error_verify}}
@@ -55,7 +46,7 @@
                     Email (optional)
                 </td>
                 <td>
-                    <input type="text" name="email" value="{{email}}">
+                    <input style="width: 200px;" type="text" name="email" value="{{email}}">
                 </td>
                 <td class="error">
                     {{error_email}}
@@ -65,6 +56,5 @@
 
         <input type="submit">
     </form>
-</body>
-
-</html>
+    
+{% endblock %}
