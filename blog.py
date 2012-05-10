@@ -1,6 +1,8 @@
 import webapp2
 import template
 import re
+import hashlib
+import hmac
 from google.appengine.ext import db
 
 # Global functions and variables
@@ -45,6 +47,7 @@ class Post(db.Model):
 class BlogFront(template.TemplateHandler):
     def get(self):
         logged_in = False
+        username = ''
         user_id = self.request.cookies.get('user_id')
         if user_id:
             logged_in = True
@@ -180,6 +183,8 @@ class LogIn(template.TemplateHandler):
                 self.redirect('/blog/welcome')
             else:
                 have_error = True
+        else:
+            have_error = True
         
         if have_error:
             error = 'Invalid login'
