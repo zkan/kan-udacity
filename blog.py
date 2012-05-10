@@ -3,6 +3,7 @@ import template
 import re
 from google.appengine.ext import db
 
+# Global functions and variables
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
     return username and USER_RE.match(username)
@@ -22,6 +23,7 @@ def valid_cookie(cookie):
 def blog_key(name = 'default'):
     return db.Key.from_path('blogs', name)
 
+# Data models
 class User(db.Model):
     username = db.StringProperty(required = True)
     password = db.TextProperty(required = True)
@@ -39,6 +41,7 @@ class Post(db.Model):
         self._render_text = self.content.replace('\n', '<br>')
         return template.render_str("post.html", p = self)
 
+# Classes
 class BlogFront(template.TemplateHandler):
     def get(self):
 #        posts = db.GqlQuery("select * from Post order by created desc limit 10")
@@ -84,12 +87,15 @@ class NewPost(template.TemplateHandler):
 class Welcome(template.TemplateHandler):
     def get(self):
         user_id = self.request.cookies.get('user_id')
-        key = db.Key.from_path('User', int(user_id))
-        u = db.get(key)
-        username = u.username
+        if user_id:
+            key = db.Key.from_path('User', int(user_id), parent=blog_key())
+            u = db.get(key)
+            username = u.username
 
-        if valid_username(username):
-            self.render('welcome.html', username = username)
+            if valid_username(username):
+                self.render('welcome.html', username = username)
+            else: 
+                self.redirect('/blog/signup')
         else: 
             self.redirect('/blog/signup')
 
@@ -129,19 +135,16 @@ class SignUp(template.TemplateHandler):
             username_in_db = query.fetch(1)
             
             if not username_in_db:
-                u = User(username = username, 
-                              password = password, 
-                              email = email)
+                u = User(parent = blog_key(),
+                         username = username, 
+                         password = password, 
+                         email = email)
                 u.put()
 
                 user_id = str(u.key().id())
-                header_value = str('user_id=%s; Path=/' % user_id)
-                self.write(header_value)
-#                if valid_cookie(header_value):
-#                    self.response.headers.add_header('Set-Cookie', header_value)
-#                    self.redirect('/blog/welcome')
-#                else:
-#                    self.redirect('/blog/signup')
+                cookie_str = str('user_id=%s; Path=/' % user_id)
+                self.response.headers.add_header('Set-Cookie', cookie_str)
+                self.redirect('/blog/welcome')
             else:
                params['error_username'] = "That user already exists."
                self.render('signup-form.html', **params)
@@ -152,12 +155,13 @@ class LogIn(template.TemplateHandler):
 
 class LogOut(template.TemplateHandler):
     def get(self):
-        self.response.headers.add_header("Set-Cookie", "user_id=; Path=/")
-        cookie = self.request.cookies.get('username')
-#        if valid_cookie(cookie):
-#            self.write('yes, valid')
-        self.redirect('/blog/signup')
+        self.response.headers['Content-Type'] = 'text/plain'
+        cookie_str = 'user_id=; Path=/'
+        if valid_cookie(cookie_str):
+            self.response.headers.add_header("Set-Cookie", cookie_str)
+            self.redirect('/blog/signup')
 
+# Handlers
 app = webapp2.WSGIApplication([('/blog/?', BlogFront),
                                ('/blog/(\d+)', PostPage),
                                ('/blog/newpost', NewPost), 
