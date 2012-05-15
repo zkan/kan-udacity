@@ -203,12 +203,12 @@ def generate_json(posts):
     jc = ''
 #    xxx.strftime("%b %d, %Y")
     if len(posts) > 1:
-        jc = ', '.join("{\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"}" % (p.content, p.created.strftime("%a %b %d %H:%M:%S %Y"), p.last_modified.strftime("%a %b %d %H:%M:%S %Y"), p.subject) for p in posts)
+        jc = ', '.join("{\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": \"%s\"}" % (p.content.replace('"', '\\\\"').replace("'", '\\\''), p.created.strftime("%a %b %d %H:%M:%S %Y"), p.last_modified.strftime("%a %b %d %H:%M:%S %Y"), p.subject.replace('"', '\\\\"').replace("'", '\\\'')) for p in posts)
         
         jc = '[' + jc + ']'
     else:
         p = posts[0]
-        jc = "{\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"}" % (p.content, p.created.strftime("%a %b %d %H:%M:%S %Y"), p.last_modified.strftime("%a %b %d %H:%M:%S %Y"), p.subject)
+        jc = "{\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": \"%s\"}" % (p.content.replace('"', '\\\\"').replace("'", '\\\''), p.created.strftime("%a %b %d %H:%M:%S %Y"), p.last_modified.strftime("%a %b %d %H:%M:%S %Y"), p.subject.replace('"', '\\\\"').replace("'", '\\\''))
 
     return jc
 
