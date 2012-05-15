@@ -3,6 +3,7 @@ import template
 import re
 import hashlib
 import hmac
+import json
 from google.appengine.ext import db
 
 # Global functions and variables
@@ -198,6 +199,37 @@ class LogOut(template.TemplateHandler):
             self.response.headers.add_header("Set-Cookie", cookie_str)
             self.redirect('/blog/signup')
 
+def generate_json(posts):
+    jc = ''
+    if len(posts) > 1:
+        for p in posts:
+            jc = ','.join("\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"" % (p.content, p.created, p.last_modified, p.subject) for p in posts)
+            jc = '{' + jc + '}'
+
+        jc = '{[' + jc + ']}'
+    else:
+        jc = ','.join("\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"" % (p.content, p.created, p.last_modified, p.subject) for p in posts)
+        jc = '{' + jc + '}'
+
+    return jc
+
+class JSONPage(template.TemplateHandler):
+    def get(self, post_id):
+        self.response.headers['Content-Type'] = 'application/json; charset=UTF-8'
+        if post_id:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+
+            if not post:
+                self.error(404)
+                return
+
+            posts = [post]
+            self.write(generate_json(posts))
+        else:
+            posts = Post.all().order('-created')
+            self.write(generate_json(posts))
+
 # Handlers
 app = webapp2.WSGIApplication([('/blog/?', BlogFront),
                                ('/blog/(\d+)', PostPage),
@@ -205,7 +237,8 @@ app = webapp2.WSGIApplication([('/blog/?', BlogFront),
                                ('/blog/welcome', Welcome), 
                                ('/blog/signup', SignUp), 
                                ('/blog/login', LogIn),
-                               ('/blog/logout', LogOut)
+                               ('/blog/logout', LogOut), 
+                               ('/blog/(\d+)?\.json', JSONPage), 
                                ], 
                               debug = True)
 
