@@ -189,7 +189,7 @@ class LogIn(template.TemplateHandler):
         
         if have_error:
             error = 'Invalid login'
-            self.render('login-form.html', username = username, error = error )
+            self.render('login-form.html', username = username, error = error)
 
 class LogOut(template.TemplateHandler):
     def get(self):
@@ -203,14 +203,12 @@ def generate_json(posts):
     jc = ''
 #    xxx.strftime("%b %d, %Y")
     if len(posts) > 1:
-        for p in posts:
-            jc = ','.join("\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"" % (p.content, p.created, p.last_modified, p.subject) for p in posts)
-            jc = '{' + jc + '}'
-
-        jc = '{[' + jc + ']}'
+        jc = ', '.join("{\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"}" % (p.content, p.created.strftime("%a %b %d %H:%M:%S %Y"), p.last_modified.strftime("%a %b %d %H:%M:%S %Y"), p.subject) for p in posts)
+        
+        jc = '[' + jc + ']'
     else:
-        jc = ','.join("\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"" % (p.content, p.created, p.last_modified, p.subject) for p in posts)
-        jc = '{' + jc + '}'
+        p = posts[0]
+        jc = "{\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"}" % (p.content, p.created.strftime("%a %b %d %H:%M:%S %Y"), p.last_modified.strftime("%a %b %d %H:%M:%S %Y"), p.subject)
 
     return jc
 
@@ -229,6 +227,7 @@ class JSONPage(template.TemplateHandler):
             self.write(generate_json(posts))
         else:
             posts = Post.all().order('-created')
+            posts = list(posts)
             self.write(generate_json(posts))
 
 # Handlers
