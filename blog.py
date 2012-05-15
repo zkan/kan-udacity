@@ -201,6 +201,7 @@ class LogOut(template.TemplateHandler):
 
 def generate_json(posts):
     jc = ''
+#    xxx.strftime("%b %d, %Y")
     if len(posts) > 1:
         for p in posts:
             jc = ','.join("\"content\": \"%s\", \"created\": \"%s\", \"last_modified\": \"%s\", \"subject\": %s\"" % (p.content, p.created, p.last_modified, p.subject) for p in posts)
