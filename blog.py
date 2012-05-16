@@ -66,15 +66,30 @@ class PostPage(template.TemplateHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
+        
+        logged_in = False
+        username = ''
+        user_id = self.request.cookies.get('user_id')
+        if user_id:
+            logged_in = True
+            key = db.Key.from_path('User', int(user_id), parent=blog_key())
+            u = db.get(key)
+            username = u.username
 
         if not post:
             self.error(404)
             return
 
-        self.render("permalink.html", post = post)
+        self.render("permalink.html", logged_in = logged_in, 
+                                      username = username, 
+                                      post = post)
 
 class NewPost(template.TemplateHandler):
     def get(self):
+        user_id = self.request.cookies.get('user_id')
+        if not user_id:
+           self.redirect('/blog/login')
+
         self.render("newpost.html")
 
     def post(self):
