@@ -4,7 +4,10 @@ import re
 import hashlib
 import hmac
 import json
+import time
+import logging
 from google.appengine.ext import db
+from google.appengine.api import memcache
 
 # Global functions and variables
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -47,6 +50,14 @@ class Post(db.Model):
 # Classes
 class BlogFront(template.TemplateHandler):
     def get(self):
+        age = memcache.get('age')
+        if age is None:
+            logging.error('AGE INITIALIZED')
+            age = 0
+            memcache.set('age', time.time())
+        else:
+            age = int(time.time() - age)
+            
         logged_in = False
         username = ''
         user_id = self.request.cookies.get('user_id')
@@ -60,7 +71,8 @@ class BlogFront(template.TemplateHandler):
         posts = Post.all().order('-created')
         self.render('front.html', logged_in = logged_in, 
                                   username = username, 
-                                  posts = posts)
+                                  posts = posts, 
+                                  age = age)
 
 class PostPage(template.TemplateHandler):
     def get(self, post_id):
