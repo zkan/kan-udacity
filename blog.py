@@ -76,6 +76,14 @@ class BlogFront(template.TemplateHandler):
 
 class PostPage(template.TemplateHandler):
     def get(self, post_id):
+        age = memcache.get('age%s' % post_id)
+        if age is None:
+            logging.error('AGE INITIALIZED')
+            age = 0
+            memcache.set('age%s' % post_id, time.time())
+        else:
+            age = int(time.time() - age)
+
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
         
@@ -94,7 +102,8 @@ class PostPage(template.TemplateHandler):
 
         self.render("permalink.html", logged_in = logged_in, 
                                       username = username, 
-                                      post = post)
+                                      post = post, 
+                                      age = age)
 
 class NewPost(template.TemplateHandler):
     def get(self):
@@ -257,6 +266,11 @@ class JSONPage(template.TemplateHandler):
             posts = list(posts)
             self.write(generate_json(posts))
 
+class FlushCache(template.TemplateHandler):
+    def get(self):
+        memcache.flush_all()
+        self.redirect('/blog')
+
 # Handlers
 app = webapp2.WSGIApplication([('/blog/?', BlogFront),
                                ('/blog/(\d+)', PostPage),
@@ -265,6 +279,7 @@ app = webapp2.WSGIApplication([('/blog/?', BlogFront),
                                ('/blog/signup', SignUp), 
                                ('/blog/login', LogIn),
                                ('/blog/logout', LogOut), 
+                               ('/blog/flush', FlushCache), 
                                ('/blog/(\d+)?\.json', JSONPage), 
                                ], 
                               debug = True)
