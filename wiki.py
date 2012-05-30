@@ -15,7 +15,7 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
 DEBUG = True
-secret = 'fart'
+secret = 'zkan'
 
 def render_str(template, **params):
     t = jinja_env.get_template(template)
@@ -127,57 +127,43 @@ class Page(db.Model):
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("page.html", p = self)
 
-class BlogFront(BlogHandler):
-    def get(self):
-        posts = greetings = Post.all().order('-created')
-        self.render('front.html', posts = posts)
+#class BlogFront(BlogHandler):
+#    def get(self):
+#        posts = greetings = Post.all().order('-created')
+#        self.render('front.html', posts = posts)
 
-class PostPage(BlogHandler):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
+#class PostPage(BlogHandler):
+#    def get(self, post_id):
+#        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+#        post = db.get(key)
+#
+#        if not post:
+#            self.error(404)
+#            return
+#
+#        self.render("permalink.html", post = post)
 
-        if not post:
-            self.error(404)
-            return
-
-        self.render("permalink.html", post = post)
-
-class NewPost(BlogHandler):
-    def get(self):
-        if self.user:
-            self.render("newpost.html")
-        else:
-            self.redirect("/login")
-
-    def post(self):
-        if not self.user:
-            self.redirect('/blog')
-
-        subject = self.request.get('subject')
-        content = self.request.get('content')
-
-        if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content)
-            p.put()
-            self.redirect('/blog/%s' % str(p.key().id()))
-        else:
-            error = "subject and content, please!"
-            self.render("newpost.html", subject=subject, content=content, error=error)
-
-
-###### Unit 2 HW's
-class Rot13(BlogHandler):
-    def get(self):
-        self.render('rot13-form.html')
-
-    def post(self):
-        rot13 = ''
-        text = self.request.get('text')
-        if text:
-            rot13 = text.encode('rot13')
-
-        self.render('rot13-form.html', text = rot13)
+#class NewPost(BlogHandler):
+#    def get(self):
+#        if self.user:
+#            self.render("newpost.html")
+#        else:
+#            self.redirect("/login")
+#
+#    def post(self):
+#        if not self.user:
+#            self.redirect('/blog')
+#
+#        subject = self.request.get('subject')
+#        content = self.request.get('content')
+#
+#        if subject and content:
+#            p = Post(parent = blog_key(), subject = subject, content = content)
+#            p.put()
+#            self.redirect('/blog/%s' % str(p.key().id()))
+#        else:
+#            error = "subject and content, please!"
+#            self.render("newpost.html", subject=subject, content=content, error=error)
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -192,7 +178,7 @@ EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
 def valid_email(email):
     return not email or EMAIL_RE.match(email)
 
-class Signup(BlogHandler):
+class Signup(WikiHandler):
     def get(self):
         self.render("signup-form.html")
 
@@ -229,9 +215,9 @@ class Signup(BlogHandler):
     def done(self, *a, **kw):
         raise NotImplementedError
 
-class Unit2Signup(Signup):
-    def done(self):
-        self.redirect('/unit2/welcome?username=' + self.username)
+#class Unit2Signup(Signup):
+#    def done(self):
+#        self.redirect('/unit2/welcome?username=' + self.username)
 
 class Register(Signup):
     def done(self):
@@ -244,10 +230,10 @@ class Register(Signup):
             u = User.register(self.username, self.password, self.email)
             u.put()
 
-            self.login(u)
-            self.redirect('/blog')
+        self.login(u)
+        self.redirect('/wiki')
 
-class Login(BlogHandler):
+class Login(WikiHandler):
     def get(self):
         self.render('login-form.html')
 
@@ -258,46 +244,32 @@ class Login(BlogHandler):
         u = User.login(username, password)
         if u:
             self.login(u)
-            self.redirect('/blog')
+            self.redirect('/wiki')
         else:
             msg = 'Invalid login'
             self.render('login-form.html', error = msg)
 
-class Logout(BlogHandler):
+class Logout(WikiHandler):
     def get(self):
         self.logout()
-        self.redirect('/blog')
+        self.redirect('/wiki')
 
-class Unit3Welcome(BlogHandler):
-    def get(self):
-        if self.user:
-            self.render('welcome.html', username = self.user.name)
-        else:
-            self.redirect('/signup')
-
-class Welcome(BlogHandler):
-    def get(self):
-        username = self.request.get('username')
-        if valid_username(username):
-            self.render('welcome.html', username = username)
-        else:
-            self.redirect('/unit2/signup')
-
-class EditPage(BlogHandler):
+class EditPage(WikiHandler):
     def get(self):
         pass
 
-class WikiPage(BlogHandler):
-    def get(self):
-        pass
+class WikiPage(WikiHandler):
+    def get(self, page_name):
+        self.write(page_name)
+#        self.render('wiki-front.html')
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
-app = webapp2.WSGIApplication([('wiki/signup', Signup),
-                               ('wiki/login', Login),
-                               ('wiki/logout', Logout),
-                               ('wiki/_edit' + PAGE_RE, EditPage),
-                               ('wiki/_edit' + PAGE_RE, EditPage),
-                               ('wiki' + PAGE_RE, WikiPage),
+app = webapp2.WSGIApplication([('/wiki/signup', Signup),
+                               ('/wiki/login', Login),
+                               ('/wiki/logout', Logout),
+                               ('/wiki/_edit' + PAGE_RE, EditPage),
+                               ('/wiki/_edit' + PAGE_RE, EditPage),
+                               ('/wiki' + PAGE_RE, WikiPage),
                                ],
                               debug = DEBUG)
 
