@@ -1,9 +1,3 @@
-/* 
-    Title: Udacity CS 253 Stylesheet
-    Original URL: http://udacity-cs253.appspot.com/static/main.css
-    Author: Steve Huffman
-*/
-
 body {
     position: relative;
     font-family: Helvetica, Arial, sans-serif;
@@ -62,13 +56,6 @@ input[type=text] {
     font-family: monospace;
 }
 
-input[type=password] {
-    width: 500px;
-    font-size: 20px;
-    padding: 2px;
-    font-family: monospace;
-}
-
 textarea {
   width: 500px;
   height: 400px;
@@ -102,9 +89,6 @@ input[type=submit] {
 .post-title {
     font-size: 24px;
     font-weight: bold;
-
-    text-decoration: none;
-    color: #333
 }
 
 .post-date {
@@ -118,13 +102,4 @@ input[type=submit] {
 .post-content {
     margin-top: 5px;
 }
-
-.age {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    color: gray;
-    font-size: 12px;
-}
-
 

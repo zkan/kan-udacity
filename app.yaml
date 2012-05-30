@@ -17,6 +17,9 @@ handlers:
 - url: /blog.*
   script: blog.app
 
+- url: /wiki.*
+  script: wiki.app
+
 #- url: /blog/signup
 #  script: signup.app
 
